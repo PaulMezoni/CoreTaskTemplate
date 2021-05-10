@@ -8,15 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-
-    private static final String INSERT_NEW = "INSERT INTO users (name, lastname, age) Values (?, ?, ?);";
-    private static final String GET_ALL = "SELECT * FROM users;";
-    private static final String DROP_TABLE = "DROP TABLE IF EXISTS users;";
-    private static final String REMOVE_USER = "DELETE FROM users WHERE id = ?;";
-    private static final String TRUNCATE_TABLE = "TRUNCATE users;";
-
-
-   public class UserDaoJDBCImpl implements UserDao {
     Connection connection;
     public UserDaoJDBCImpl() {
         connection = new Util().connect();

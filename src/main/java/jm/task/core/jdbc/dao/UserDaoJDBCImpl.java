@@ -16,84 +16,64 @@ public class UserDaoJDBCImpl implements UserDao {
     private static final String TRUNCATE_TABLE = "TRUNCATE users;";
 
 
-    private static final String CREATE = "CREATE TABLE IF NOT EXISTS users " +
-            "(id BIGINT(19) NOT NULL AUTO_INCREMENT, " +
-            "name VARCHAR(45) NOT NULL," +
-            "lastname VARCHAR(45) NOT NULL, " +
-            "age TINYINT(3) NOT NULL, " +
-            "PRIMARY KEY (id));";
-
-    private final Util utilConnection = new Util();
-
+   public class UserDaoJDBCImpl implements UserDao {
+    Connection connection;
     public UserDaoJDBCImpl() {
+        connection = new Util().connect();
     }
-
     public void createUsersTable() {
-        try (Connection connection = utilConnection.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(CREATE);
+        try {
+            connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS usersTable (id BIGINT PRIMARY KEY AUTO_INCREMENT, " +
+                    "name VARCHAR(20) NOT NULL, lastname VARCHAR(20) NOT NULL, age TINYINT NOT NULL)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     public void dropUsersTable() {
-        try (Connection connection = utilConnection.getConnection();
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(DROP_TABLE);
+        try {
+            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS usersTable");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     public void saveUser(String name, String lastName, byte age) {
-        try (Connection connection = utilConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(INSERT_NEW)) {
-            preparedStatement.setString(1, name);
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO usersTable (name, lastname, age) VALUES (?, ?, ?)");
+            preparedStatement.setString(1,name);
             preparedStatement.setString(2, lastName);
-            preparedStatement.setInt(3, age);
+            preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
+            System.out.printf("User с именем – %s добавлен в базу данных" + '\n', name);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     public void removeUserById(long id) {
-        try (Connection connection = utilConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(REMOVE_USER)) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM usersTable WHERE id = ?");
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     public List<User> getAllUsers() {
-        List<User> listUsers = new ArrayList<>();
-        try (Connection connection = utilConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL)) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-
+        List<User> list = new ArrayList<>();
+        ResultSet resultSet;
+        try {
+            resultSet = connection.createStatement().executeQuery("SELECT * FROM usersTable");
             while (resultSet.next()) {
-                String name = resultSet.getString("name");
-                String lastname = resultSet.getString("lastname");
-                Byte age = resultSet.getByte("age");
-
-                User user = new User(name, lastname, age);
-                listUsers.add(user);
+                list.add(new User(resultSet.getString(2), resultSet.getString(3), resultSet.getByte(4)));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return listUsers;
+        return list;
     }
-
     public void cleanUsersTable() {
-        try (Connection connection = utilConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(TRUNCATE_TABLE)) {
-            preparedStatement.executeUpdate();
+        try {
+            connection.createStatement().executeUpdate("TRUNCATE TABLE usersTable");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-}

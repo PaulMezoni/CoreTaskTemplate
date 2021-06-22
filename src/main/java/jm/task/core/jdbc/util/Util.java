@@ -6,12 +6,14 @@ import java.sql.SQLException;
 
 public class Util {
 
+    private static final String URL = "jdbc:mysql://localhost:3306/jdbc?useSSL=false&serverTimezone=UTC";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "12345678";
+
+    public Util() {
+    }
+
     public static Connection getConnection() throws SQLException {
-        String URL= "jdbc:mysql://localhost:3306/jdbc?useUnicode=true&useSSL=true&useJDBCCompliantTimezoneShift=true" +
-                "&useLegacyDatetimeCode=false&serverTimezone=UTC";
-        String USERNAME = "root";
-        String PASSWORD = "12345678";
-        DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         return DriverManager.getConnection(URL, USERNAME, PASSWORD);
     }
 }

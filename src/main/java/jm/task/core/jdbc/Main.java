@@ -1,54 +1,34 @@
 package jm.task.core.jdbc;
 
+import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
-import jm.task.core.jdbc.util.Util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import static java.lang.System.*;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-
-        Util util = new Util();
-        util.getConnection();
+    public static void main(String[] args) {
 
         UserService userService = new UserServiceImpl();
-
-        //Создание таблицы User
+        //удаление таблицы
         userService.dropUsersTable();
+        //Создание таблицы User(ов)
         userService.createUsersTable();
-
-        // Добавление 4 User(ов) в таблицу с данными на свой выбор.
-        try (BufferedReader scanner = new BufferedReader(new InputStreamReader(in))) {
-            for (int i = 0; i < 4; i++) {
-                out.print("Name: ");
-                String name = scanner.readLine();
-
-                out.print("Lastname: ");
-                String lastname = scanner.readLine();
-
-                out.print("Age: ");
-                byte age = Byte.parseByte(scanner.readLine());
-
-                userService.saveUser(name, lastname, age);
-                out.println("User с именем – " + name + " добавлен в базу данных");
-            }
-        }
-        //Получение всех User из базы и вывод в консоль
-        out.println("Получение всех User из базы");
-        out.println(userService.getAllUsers());
-
+        //Добавление 4 User(ов) в таблицу с данными на свой выбор.
+        //После каждого добавления должен быть вывод в консоль
+        //( User с именем – name добавлен в базу данных )
+        userService.saveUser("pavel", "mezin", (byte) 35);
+        userService.saveUser("max", "madmax", (byte) 30);
+        userService.saveUser("rain", "morris", (byte) 31);
+        userService.saveUser("tor", "odin", (byte) 29);
+        // Получение всех User из базы и вывод в консоль
+        List<User> userList = userService.getAllUsers();
+        // ( должен быть переопределен toString в классе User)
+        userList.forEach(System.out::println);
         //Очистка таблицы User(ов)
         userService.cleanUsersTable();
-        out.println("таблица очищена");
-        out.println(userService.getAllUsers());
-
-        //Удаление таблицы
+        // Удаление таблицы
         userService.dropUsersTable();
-        out.println("Таблица удалена");
+
     }
 }

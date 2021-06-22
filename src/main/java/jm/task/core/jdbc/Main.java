@@ -20,7 +20,6 @@ public class Main {
         userService.saveUser("pavel", "mezin", (byte) 35);
         userService.saveUser("max", "madmax", (byte) 30);
         userService.saveUser("rain", "morris", (byte) 31);
-        userService.saveUser("tor", "odin", (byte) 29);
         // Получение всех User из базы и вывод в консоль
         List<User> userList = userService.getAllUsers();
         // ( должен быть переопределен toString в классе User)

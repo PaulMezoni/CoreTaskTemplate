@@ -9,15 +9,17 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private Connection connection;
+    private Savepoint savePoint;
 
     public UserDaoJDBCImpl() {
         try {
             connection = Util.getConnection();
             connection.setAutoCommit(false);
+            connection.setSavepoint("savePoint");
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -33,11 +35,12 @@ public class UserDaoJDBCImpl implements UserDao {
                     "name VARCHAR(30) NOT NULL, " +
                     "lastName VARCHAR(30) NOT NULL, " +
                     "age TINYINT NOT NULL)");
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -49,11 +52,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("DROP TABLE IF EXISTS Users");
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -69,11 +73,12 @@ public class UserDaoJDBCImpl implements UserDao {
             pst.setString(2, lastName);
             pst.setInt(3, age);
             pst.executeUpdate();
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -86,11 +91,12 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement pst = connection.prepareStatement("DELETE FROM Users WHERE id = ?")) {
             pst.setLong(1, id);
             pst.executeUpdate();
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -110,11 +116,12 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setId(rs.getLong("id"));
                 userList.add(user);
             }
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -127,11 +134,12 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("TRUNCATE TABLE Users");
+            connection.setSavepoint();
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
             try {
-                connection.rollback();
+                connection.rollback(savePoint);
                 connection.close();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
